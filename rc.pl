@@ -2,7 +2,37 @@
 
 :- initialization main.
 
-main :- read_lines(L), parseRubiksCube(L, C), printRubiksCube(C).
+main :-
+  read_lines(L),
+  parseRubiksCube(L, C),
+  rotateWhite(C, C1),
+  rotateWhite(C1, C2),
+  rotateWhite(C2, C3),
+  rotateWhite(C3, C4),
+  printRubiksCube(C4).
+
+rotateWhite(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
+                 [RTL, RTM, RTR|RT],
+                 [BTL, BTM, BTB|BT],
+                 [OTL, OTM, OTO|OT],
+                 [GTL, GTM, GTG|GT],
+                  Y), RC) :-
+  W = [WDL, WML, WTL, WDM, WMM, WTM, WDR, WMR, WTR],
+  R = [BTL, BTM, BTB|RT],
+  B = [OTL, OTM, OTO|BT],
+  O = [GTL, GTM, GTG|OT],
+  G = [RTL, RTM, RTR|GT],
+  RC =.. [cube, W, R, B, O, G, Y].
+
+%rotateRed :-
+
+%rotateBlue :-
+
+%rotateOrange :-
+
+%rostateGreen :-
+
+%rostateYellow :-
 
 parseRubiksCube(L, C) :- parseWhiteSide(L, W),
                          parseMiddleSide(L, 0, R),
