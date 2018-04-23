@@ -14,55 +14,80 @@ main :-
                      ['4','4','4','4','4','4','4','4','4'],  %Green
                      ['6','6','6','6','6','6','6','6','6']], %Yellow
   !,
-  assertz(SC),
   assertz(node(C, root, nonexpanded)),
+  assertz(SC),
   solveCube,
   !,
-  node(C, _, solved),
-  backtrackShortestPath(C, Path),
+  node(FC, _, solved),
+  backtrackShortestPath(FC, Path),
   !,
   reverse(Path, R),
   printSolution(R).
 
+% Breadth-first search algorithm
+
+% Check if any nonexpanded cube in database is solved
 solveCube :-
   node(cube(W, R, B, O, G, Y), P, nonexpanded),
   solvedCube(W, R, B, O, G, Y),
   retract(node(cube(W, R, B, O, G, Y), P, nonexpanded)),
   assertz(node(cube(W, R, B, O, G, Y), P, solved)).
-/*
+
+% Expand first nonexpanded cube in database
 solveCube :-
-  assertz(C),
-  rotate(C, cube(RW, RR, RB, RO, RG, RY)),
-  not(cube(RW, RR, RB, RO, RG, RY)),
-  solveCube(cube(RW, RR, RB, RO, RG, RY), SC).
-solveCube(cube(W, R, B, O, G, Y), _) :-
-  cube(W, R, B, O, G, Y),
-  retract(cube(W, R, B, O, G, Y)),
-  fail.
+  node(C, P, nonexpanded),
+  % Rotate every side of cube
+  rotateWhite(C, W),
+  rotateRed(C, R),
+  rotateBlue(C, B),
+  rotateOrange(C, O),
+  rotateGreen(C, G),
+  rotateYellow(C, Y),
+  % Add rotated cubes to database
+  addCube(W, C),
+  addCube(R, C),
+  addCube(B, C),
+  addCube(O, C),
+  addCube(G, C),
+  addCube(Y, C),
+  retract(node(C, P, nonexpanded)),
+  assertz(node(C, P, expanded)),
+  solveCube.
 
-rotate(C, RC) :-
-  rotateWhite(C, RC).
-rotate(C, RC) :-
-  rotateRed(C, RC).
-rotate(C, RC) :-
-  rotateBlue(C, RC).
-rotate(C, RC) :-
-  rotateOrange(C, RC).
-rotate(C, RC) :-
-  rotateGreen(C, RC).
-rotate(C, RC) :-
-  rotateYellow(C, RC).
-*/
+% Add cube to database
+addCube(C, P) :-
+  % Check if cube is already in database
+  not(node(C, P, nonexpanded)),
+  not(node(C, P, expanded)),
+  assertz(node(C, P, nonexpanded)).
+addCube(_,_).
 
+% Backtrack path from solved cube to root cube using parents
 backtrackShortestPath(root, _).
 backtrackShortestPath(P, [P|T]) :-
   node(P, NP, _),
   backtrackShortestPath(NP, T).
 
 printSolution([]).
+printSolution([H]) :-
+  printCube(H).
 printSolution([H|T]) :-
   printCube(H),
+  write("\n"),
   printSolution(T).
+
+% Rotation for every side of cube
+% 5 - White
+% 1 - Red
+% 2 - Blue
+% 3 - Orange
+% 4 - Green
+% 6 - Yellow
+% T - Top
+% M - Middle
+% D - Down
+% L - Left
+% R - Right
 
 rotateWhite(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
                  [RTL, RTM, RTR|RT],
@@ -142,6 +167,7 @@ G = [GTL, GTM, GTR, GML, GMM, GMR, ODL, ODM, ODR],
 Y = [YDL, YML, YTL, YDM, YMM, YTM, YDR, YMR, YTR],
 RC =.. [cube, W, R, B, O, G, Y].
 
+% Convert input to cube representation
 parseCube(L, C) :-
   parseWhiteSide(L, W),
   parseMiddleSide(L, 0, R),
@@ -151,13 +177,13 @@ parseCube(L, C) :-
   parseYellowSide(L, Y),
   C =.. [cube, W, R, B, O, G, Y].
 
+% Convert cube representation to output
 printCube(cube(W, R, B, O, G, Y)) :-
   printSide(W),
   printMiddelSidesLine(R, B, O, G, 0),
   printMiddelSidesLine(R, B, O, G, 3),
   printMiddelSidesLine(R, B, O, G, 6),
   printSide(Y).
-
 
 parseWhiteSide([T, M, D|_], W) :-
   append([T, M, D], W).
@@ -204,6 +230,18 @@ printLine([H|T]) :-
   write(H), printLine(T).
 printLine([]).
 
+take(_, [], []).
+take(N, [H|T], [H|TT]) :-
+  N > 0, !, NN is N-1, take(NN, T, TT).
+take(_, _, []).
+
+drop(_, [], []).
+drop(N, [_|T], TT) :-
+  N > 0, !, NN is N-1, drop(NN, T, TT).
+drop(N, [H|T], [H|TT]) :-
+  drop(N, T, TT).
+
+% Implementation of input reading from labs (cv4)
 read_line(L, C) :-
   get_char(C),
   (isEOFEOL(C), L = [], !;
@@ -218,14 +256,3 @@ read_lines(Ls) :-
   read_line(L, C),
   (C == end_of_file, Ls=[] ;
   (read_lines(LLs), [L|LLs] = Ls)).
-
-take(_, [], []).
-take(N, [H|T], [H|TT]) :-
-  N > 0, !, NN is N-1, take(NN, T, TT).
-take(_, _, []).
-
-drop(_, [], []).
-drop(N, [_|T], TT) :-
-  N > 0, !, NN is N-1, drop(NN, T, TT).
-drop(N, [H|T], [H|TT]) :-
-  drop(N, T, TT).
