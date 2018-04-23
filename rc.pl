@@ -1,11 +1,54 @@
 :- use_module(library(lists)).
 
+
 :- initialization main.
+
 
 main :-
   read_lines(L),
-  parseRubiksCube(L, C),
-  printRubiksCube(C).
+  parseCube(L, C),
+  SC =.. [solvedCube,['5','5','5','5','5','5','5','5','5'], %White
+                     ['1','1','1','1','1','1','1','1','1'], %Red
+                     ['2','2','2','2','2','2','2','2','2'], %Blue
+                     ['3','3','3','3','3','3','3','3','3'], %Orange
+                     ['4','4','4','4','4','4','4','4','4'], %Green
+                     ['6','6','6','6','6','6','6','6','6']], %Yellow
+  !,
+  solveCube(C, SC),
+  printSolution.
+
+solveCube(cube(W, R, B, O, G, Y), solvedCube(W, R, B, O, G, Y)) :-
+  assertz(cube(W, R, B, O, G, Y)).
+solveCube(C, SC) :-
+  assertz(C),
+  rotate(C, cube(RW, RR, RB, RO, RG, RY)),
+  not(cube(RW, RR, RB, RO, RG, RY)),
+  solveCube(cube(RW, RR, RB, RO, RG, RY), SC).
+solveCube(cube(W, R, B, O, G, Y), _) :-
+  cube(W, R, B, O, G, Y),
+  retract(cube(W, R, B, O, G, Y)),
+  fail.
+
+rotate(C, RC) :-
+  rotateWhite(C, RC).
+rotate(C, RC) :-
+  rotateRed(C, RC).
+rotate(C, RC) :-
+  rotateBlue(C, RC).
+rotate(C, RC) :-
+  rotateOrange(C, RC).
+rotate(C, RC) :-
+  rotateGreen(C, RC).
+rotate(C, RC) :-
+  rotateYellow(C, RC).
+
+printSolution :-
+  cube(W, R, B, O, G, Y),
+  retract(cube(W, R, B, O, G, Y)),
+  printCube(cube(W, R, B, O, G, Y)),
+  write("\n"),
+  printSolution.
+printSolution.
 
 rotateWhite(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
                  [RTL, RTM, RTR|RT],
@@ -85,15 +128,16 @@ G = [GTL, GTM, GTR, GML, GMM, GMR, ODL, ODM, ODR],
 Y = [YDL, YML, YTL, YDM, YMM, YTM, YDR, YMR, YTR],
 RC =.. [cube, W, R, B, O, G, Y].
 
-parseRubiksCube(L, C) :- parseWhiteSide(L, W),
-                         parseMiddleSide(L, 0, R),
-                         parseMiddleSide(L, 4, B),
-                         parseMiddleSide(L, 8, O),
-                         parseMiddleSide(L, 12, G),
-                         parseYellowSide(L, Y),
-                         C =.. [cube, W, R, B, O, G, Y].
+parseCube(L, C) :-
+  parseWhiteSide(L, W),
+  parseMiddleSide(L, 0, R),
+  parseMiddleSide(L, 4, B),
+  parseMiddleSide(L, 8, O),
+  parseMiddleSide(L, 12, G),
+  parseYellowSide(L, Y),
+  C =.. [cube, W, R, B, O, G, Y].
 
-printRubiksCube(cube(W, R, B, O, G, Y)) :-
+printCube(cube(W, R, B, O, G, Y)) :-
   printSide(W),
   printMiddelSidesLine(R, B, O, G, 0),
   printMiddelSidesLine(R, B, O, G, 3),
