@@ -5,11 +5,7 @@
 main :-
   read_lines(L),
   parseRubiksCube(L, C),
-  rotateWhite(C, C1),
-  rotateWhite(C1, C2),
-  rotateWhite(C2, C3),
-  rotateWhite(C3, C4),
-  printRubiksCube(C4).
+  printRubiksCube(C).
 
 rotateWhite(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
                  [RTL, RTM, RTR|RT],
@@ -24,15 +20,70 @@ rotateWhite(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
   G = [RTL, RTM, RTR|GT],
   RC =.. [cube, W, R, B, O, G, Y].
 
-%rotateRed :-
+rotateRed(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
+               [RTL, RTM, RTR, RML, RMM, RMR, RDL, RDM, RDR],
+               [BTL, BTM, BTR, BML, BMM, BMR, BDL, BDM, BDR],
+                O,
+               [GTL, GTM, GTR, GML, GMM, GMR, GDL, GDM, GDR],
+               [YTL, YTM, YTR|YT]), RC) :-
+  W = [WTL, WTM, WTR, WML, WMM, WMR, GDR, GMR, GTR],
+  R = [RDL, RML, RTL, RDM, RMM, RTM, RDR, RMR, RTR],
+  B = [WDL, BTM, BTR, WDM, BMM, BMR, WDR, BDM, BDR],
+  G = [GTL, GTM, YTL, GML, GMM, YTM, GDL, GDM, YTR],
+  Y = [BDL, BML, BTL|YT],
+  RC =.. [cube, W, R, B, O, G, Y].
 
-%rotateBlue :-
+rotateBlue(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
+                [RTL, RTM, RTR, RML, RMM, RMR, RDL, RDM, RDR],
+                [BTL, BTM, BTR, BML, BMM, BMR, BDL, BDM, BDR],
+                [OTL, OTM, OTR, OML, OMM, OMR, ODL, ODM, ODR],
+                 G,
+                [YTL, YTM, YTR, YML, YMM, YMR, YDL, YDM, YDR]), RC) :-
+W = [WTL, WTM, RTR, WML, WMM, RMR, WDL, WDM, RDR],
+R = [RTL, RTM, YTR, RML, RMM, YMR, RDL, RDM, YDR],
+B = [BDL, BML, BTL, BDM, BMM, BTM, BDR, BMR, BTR],
+O = [WDR, OTM, OTR, WMR, OMM, OMR, WTR, ODM, ODR],
+Y = [YTL, YTM, ODL, YML, YMM, OML, YDL, YDM, OTL],
+RC =.. [cube, W, R, B, O, G, Y].
 
-%rotateOrange :-
+rotateOrange(cube([WTL, WTM, WTR|WT],
+                   R,
+                  [BTL, BTM, BTR, BML, BMM, BMR, BDL, BDM, BDR],
+                  [OTL, OTM, OTR, OML, OMM, OMR, ODL, ODM, ODR],
+                  [GTL, GTM, GTR, GML, GMM, GMR, GDL, GDM, GDR],
+                  [YTL, YTM, YTR, YML, YMM, YMR, YDL, YDM, YDR]), RC) :-
+W = [BTR, BMR, BDR|WT],
+B = [BTL, BTM, YDR, BML, BMM, YDM, BDL, BDM, YDL],
+O = [ODL, OML, OTL, ODM, OMM, OTM, ODR, OMR, OTR],
+G = [WTR, GTM, GTR, WTM, GMM, GMR, WTL, GDM, GDR],
+Y = [YTL, YTM, YTR, YML, YMM, YMR, GTL, GML, GDL],
+RC =.. [cube, W, R, B, O, G, Y].
 
-%rostateGreen :-
+rotateGreen(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
+                  [RTL, RTM, RTR, RML, RMM, RMR, RDL, RDM, RDR],
+                   B,
+                  [OTL, OTM, OTR, OML, OMM, OMR, ODL, ODM, ODR],
+                  [GTL, GTM, GTR, GML, GMM, GMR, GDL, GDM, GDR],
+                  [YTL, YTM, YTR, YML, YMM, YMR, YDL, YDM, YDR]), RC) :-
+W = [ODR, WTM, WTR, OMR, WMM, WMR, OTR, WDM, WDR],
+R = [WTL, RTM, RTR, WML, RMM, RMR, WDL, RDM, RDR],
+O = [OTL, OTM, YDL, OML, OMM, YML, ODL, ODM, YTL],
+G = [GDL, GML, GTL, GDM, GMM, GTM, GDR, GMR, GTR],
+Y = [RTL, YTM, YTR, RML, YMM, YMR, RDL, YDM, YDR],
+RC =.. [cube, W, R, B, O, G, Y].
 
-%rostateYellow :-
+rotateYellow(cube( W,
+                  [RTL, RTM, RTR, RML, RMM, RMR, RDL, RDM, RDR],
+                  [BTL, BTM, BTR, BML, BMM, BMR, BDL, BDM, BDR],
+                  [OTL, OTM, OTR, OML, OMM, OMR, ODL, ODM, ODR],
+                  [GTL, GTM, GTR, GML, GMM, GMR, GDL, GDM, GDR],
+                  [YTL, YTM, YTR, YML, YMM, YMR, YDL, YDM, YDR]), RC) :-
+R = [RTL, RTM, RTR, RML, RMM, RMR, GDL, GDM, GDR],
+B = [BTL, BTM, BTR, BML, BMM, BMR, RDL, RDM, RDR],
+O = [OTL, OTM, OTR, OML, OMM, OMR, BDL, BDM, BDR],
+G = [GTL, GTM, GTR, GML, GMM, GMR, ODL, ODM, ODR],
+Y = [YDL, YML, YTL, YDM, YMM, YTM, YDR, YMR, YTR],
+RC =.. [cube, W, R, B, O, G, Y].
 
 parseRubiksCube(L, C) :- parseWhiteSide(L, W),
                          parseMiddleSide(L, 0, R),
