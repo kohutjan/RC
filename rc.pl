@@ -7,19 +7,30 @@
 main :-
   read_lines(L),
   parseCube(L, C),
-  SC =.. [solvedCube,['5','5','5','5','5','5','5','5','5'], %White
-                     ['1','1','1','1','1','1','1','1','1'], %Red
-                     ['2','2','2','2','2','2','2','2','2'], %Blue
-                     ['3','3','3','3','3','3','3','3','3'], %Orange
-                     ['4','4','4','4','4','4','4','4','4'], %Green
+  SC =.. [solvedCube,['5','5','5','5','5','5','5','5','5'],  %White
+                     ['1','1','1','1','1','1','1','1','1'],  %Red
+                     ['2','2','2','2','2','2','2','2','2'],  %Blue
+                     ['3','3','3','3','3','3','3','3','3'],  %Orange
+                     ['4','4','4','4','4','4','4','4','4'],  %Green
                      ['6','6','6','6','6','6','6','6','6']], %Yellow
   !,
-  solveCube(C, SC),
-  printSolution.
+  assertz(SC),
+  assertz(node(C, root, nonexpanded)),
+  solveCube,
+  !,
+  node(C, _, solved),
+  backtrackShortestPath(C, Path),
+  !,
+  reverse(Path, R),
+  printSolution(R).
 
-solveCube(cube(W, R, B, O, G, Y), solvedCube(W, R, B, O, G, Y)) :-
-  assertz(cube(W, R, B, O, G, Y)).
-solveCube(C, SC) :-
+solveCube :-
+  node(cube(W, R, B, O, G, Y), P, nonexpanded),
+  solvedCube(W, R, B, O, G, Y),
+  retract(node(cube(W, R, B, O, G, Y), P, nonexpanded)),
+  assertz(node(cube(W, R, B, O, G, Y), P, solved)).
+/*
+solveCube :-
   assertz(C),
   rotate(C, cube(RW, RR, RB, RO, RG, RY)),
   not(cube(RW, RR, RB, RO, RG, RY)),
@@ -41,14 +52,17 @@ rotate(C, RC) :-
   rotateGreen(C, RC).
 rotate(C, RC) :-
   rotateYellow(C, RC).
+*/
 
-printSolution :-
-  cube(W, R, B, O, G, Y),
-  retract(cube(W, R, B, O, G, Y)),
-  printCube(cube(W, R, B, O, G, Y)),
-  write("\n"),
-  printSolution.
-printSolution.
+backtrackShortestPath(root, _).
+backtrackShortestPath(P, [P|T]) :-
+  node(P, NP, _),
+  backtrackShortestPath(NP, T).
+
+printSolution([]).
+printSolution([H|T]) :-
+  printCube(H),
+  printSolution(T).
 
 rotateWhite(cube([WTL, WTM, WTR, WML, WMM, WMR, WDL, WDM, WDR],
                  [RTL, RTM, RTR|RT],
