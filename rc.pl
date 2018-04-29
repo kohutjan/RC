@@ -40,7 +40,7 @@ solveCube :-
 
 % Expand first nonexpanded cube in database
 solveCube :-
-  node(C, P, nonexpanded, T),
+  node(C, P, nonexpanded, compared),
   % Rotate cube in every possible way
   rotateWhite(C, W90),
   rotateRed(C, R90),
@@ -60,27 +60,21 @@ solveCube :-
   rotateOrange(O180, O270),
   rotateGreen(G180, G270),
   rotateYellow(Y180, Y270),
-  % Add rotated cubes to database
+  % Add rotated cubes to database (ignore 180)
   addCube(W90, C),
   addCube(R90, C),
   addCube(B90, C),
   addCube(O90, C),
   addCube(G90, C),
   addCube(Y90, C),
-  addCube(W180, C),
-  addCube(R180, C),
-  addCube(B180, C),
-  addCube(O180, C),
-  addCube(G180, C),
-  addCube(Y180, C),
   addCube(W270, C),
   addCube(R270, C),
   addCube(B270, C),
   addCube(O270, C),
   addCube(G270, C),
   addCube(Y270, C),
-  retract(node(C, P, nonexpanded, T)),
-  assertz(node(C, P, expanded, T)),
+  retract(node(C, P, nonexpanded, compared)),
+  assertz(node(C, P, expanded, compared)),
   solveCube.
 
 % Add cube to database
