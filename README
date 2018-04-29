@@ -1,0 +1,28 @@
+Projekt řeší rubikovu kostku pomocí prohledávání do šířky.
+První pokus řešení byl pomocí prohledávání do hloubky, tento
+přístup byl vzhledem k velikosti stavového prostoru kostky
+použitelný jen pro specifické případy. Prohledávání do hloubky
+zvládá řešit maximálně čtyři otočení v přijatelném čase,
+při zanoření do páté úrovně je výpočet značně zdlouhavý.
+Obecné řešení by vyžadovalo prohledávání s nějakou heuristikou,
+případně implementaci známých algoritmických postupů.
+Tyto přístupy jsem nezkoušel, jelikož jsem za hlavní cíl
+tohoto projektu považoval vyzkoušení backtracking.
+
+Složka "tests" obsahuje vstupy, které potřebují k řešení 1, 2, 3, 4 a 5
+otočení. Následující časy odpovídají době běhu na servru merlin. Měřeno
+pomocí time, uvedené časy jsou součtem user + sys.
+
+tests/scrable_1.txt    0.020s
+tests/scrable_1_2.txt  0.031s
+tests/scrable_2.txt    0.037s
+tests/scrable_2_2.txt  0.047s
+tests/scrable_3.txt    0.905s
+tests/scrable_3_2.txt  0.725s
+tests/scrable_4.txt    28.539s
+tests/scrable_4_2.txt  15.362s
+tests/scramble_5.txt   27m44.473s
+
+Pozn: Při výpisu na stdout prolog vypisuje ":|:|" před výstup programu,
+      nepodařilo se mně zjistit příčinu tohoto chování, při přesměrování
+      výstupu do souboru se tyto znaky nevypíší.
