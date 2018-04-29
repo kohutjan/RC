@@ -1,7 +1,6 @@
 :- use_module(library(lists)).
 
-
-:- initialization main.
+:- initialization(main, restore).
 
 
 main :-
@@ -14,58 +13,87 @@ main :-
                      ['4','4','4','4','4','4','4','4','4'],  %Green
                      ['6','6','6','6','6','6','6','6','6']], %Yellow
   !,
-  assertz(node(C, root, nonexpanded)),
+  assertz(node(C, root, nonexpanded, none)),
   assertz(SC),
   solveCube,
   !,
-  node(FC, _, solved),
+  node(FC, _, solved, _),
   backtrackShortestPath(FC, Path),
   !,
   reverse(Path, R),
-  printSolution(R).
+  printSolution(R),
+  halt.
+
+main :-
+  halt(1).
 
 % Breadth-first search algorithm
 
 % Check if any nonexpanded cube in database is solved
 solveCube :-
-  node(cube(W, R, B, O, G, Y), P, nonexpanded),
+  node(cube(W, R, B, O, G, Y), P, nonexpanded, none),
+  retract(node(cube(W, R, B, O, G, Y), P, nonexpanded, none)),
+  assertz(node(cube(W, R, B, O, G, Y), P, nonexpanded, compared)),
   solvedCube(W, R, B, O, G, Y),
-  retract(node(cube(W, R, B, O, G, Y), P, nonexpanded)),
-  assertz(node(cube(W, R, B, O, G, Y), P, solved)).
+  retract(node(cube(W, R, B, O, G, Y), P, nonexpanded, compared)),
+  assertz(node(cube(W, R, B, O, G, Y), P, solved, compared)).
 
 % Expand first nonexpanded cube in database
 solveCube :-
-  node(C, P, nonexpanded),
-  % Rotate every side of cube
-  rotateWhite(C, W),
-  rotateRed(C, R),
-  rotateBlue(C, B),
-  rotateOrange(C, O),
-  rotateGreen(C, G),
-  rotateYellow(C, Y),
+  node(C, P, nonexpanded, T),
+  % Rotate cube in every possible way
+  rotateWhite(C, W90),
+  rotateRed(C, R90),
+  rotateBlue(C, B90),
+  rotateOrange(C, O90),
+  rotateGreen(C, G90),
+  rotateYellow(C, Y90),
+  rotateWhite(W90, W180),
+  rotateRed(R90, R180),
+  rotateBlue(B90, B180),
+  rotateOrange(O90, O180),
+  rotateGreen(G90, G180),
+  rotateYellow(Y90, Y180),
+  rotateWhite(W180, W270),
+  rotateRed(R180, R270),
+  rotateBlue(B180, B270),
+  rotateOrange(O180, O270),
+  rotateGreen(G180, G270),
+  rotateYellow(Y180, Y270),
   % Add rotated cubes to database
-  addCube(W, C),
-  addCube(R, C),
-  addCube(B, C),
-  addCube(O, C),
-  addCube(G, C),
-  addCube(Y, C),
-  retract(node(C, P, nonexpanded)),
-  assertz(node(C, P, expanded)),
+  addCube(W90, C),
+  addCube(R90, C),
+  addCube(B90, C),
+  addCube(O90, C),
+  addCube(G90, C),
+  addCube(Y90, C),
+  addCube(W180, C),
+  addCube(R180, C),
+  addCube(B180, C),
+  addCube(O180, C),
+  addCube(G180, C),
+  addCube(Y180, C),
+  addCube(W270, C),
+  addCube(R270, C),
+  addCube(B270, C),
+  addCube(O270, C),
+  addCube(G270, C),
+  addCube(Y270, C),
+  retract(node(C, P, nonexpanded, T)),
+  assertz(node(C, P, expanded, T)),
   solveCube.
 
 % Add cube to database
 addCube(C, P) :-
   % Check if cube is already in database
-  not(node(C, P, nonexpanded)),
-  not(node(C, P, expanded)),
-  assertz(node(C, P, nonexpanded)).
+  not(node(C, P, _, _)),
+  assertz(node(C, P, nonexpanded, none)).
 addCube(_,_).
 
 % Backtrack path from solved cube to root cube using parents
 backtrackShortestPath(root, _).
 backtrackShortestPath(P, [P|T]) :-
-  node(P, NP, _),
+  node(P, NP, _, _),
   backtrackShortestPath(NP, T).
 
 printSolution([]).
