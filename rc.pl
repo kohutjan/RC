@@ -95,7 +95,7 @@ printSolution([H]) :-
   printCube(H).
 printSolution([H|T]) :-
   printCube(H),
-  write("\n"),
+  write('\n'),
   printSolution(T).
 
 % Rotation for every side of cube
@@ -224,11 +224,11 @@ parseYellowSide([_,_,_,_,_,_, T, M, D|_], Y) :-
 
 printSide([TL, TM, TR, ML, MM, MR|D]) :-
   printLine([TL, TM, TR]),
-  write("\n"),
+  write('\n'),
   printLine([ML, MM, MR]),
-  write("\n"),
+  write('\n'),
   printLine(D),
-  write("\n").
+  write('\n').
 
 printMiddelSidesLine(R, B, O, G, Drop) :-
   drop(Drop, R, RS),
@@ -240,13 +240,13 @@ printMiddelSidesLine(R, B, O, G, Drop) :-
   take(3, OS, OL),
   take(3, GS, GL),
   printLine(RL),
-  write(" "),
+  write(' '),
   printLine(BL),
-  write(" "),
+  write(' '),
   printLine(OL),
-  write(" "),
+  write(' '),
   printLine(GL),
-  write("\n").
+  write('\n').
 
 printLine([H|T]) :-
   write(H), printLine(T).
