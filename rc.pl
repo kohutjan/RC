@@ -1,3 +1,9 @@
+/*
+  project: Rubikova kostka
+  login: xkohut08
+  name: Jan Kohút
+  date: 29. 4. 2018
+*/
 :- use_module(library(lists)).
 
 :- initialization(main, restore).
